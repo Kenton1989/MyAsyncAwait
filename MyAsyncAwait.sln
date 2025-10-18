@@ -3,12 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyAsyncAwait", "MyAsyncAwait\MyAsyncAwait.csproj", "{AF083FA0-C063-4B59-B148-D3FA24520686}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyAsyncAwaitTest", "MyAsyncAwaitTest\MyAsyncAwaitTest.csproj", "{ADD4CAB9-8231-4F58-A920-B6011F2DDB9C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF083FA0-C063-4B59-B148-D3FA24520686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF083FA0-C063-4B59-B148-D3FA24520686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF083FA0-C063-4B59-B148-D3FA24520686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF083FA0-C063-4B59-B148-D3FA24520686}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADD4CAB9-8231-4F58-A920-B6011F2DDB9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADD4CAB9-8231-4F58-A920-B6011F2DDB9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADD4CAB9-8231-4F58-A920-B6011F2DDB9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADD4CAB9-8231-4F58-A920-B6011F2DDB9C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BFC40608-2038-41CB-8F2F-774DCC11CA1C}
 	EndGlobalSection
 EndGlobal
