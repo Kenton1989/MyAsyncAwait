@@ -11,36 +11,38 @@ public class TaskTest
     }
 
     [Test]
-    public void IncompletTaskTest()
+    public void TaskIncompletedTest()
     {
         var task = new MyTask();
+
         task.IsCompleted.Should().BeFalse();
+        FluentActions.Invoking(() => task.EnsureComplete()).Should().Throw<TaskIncompletedException>();
     }
 
     [Test]
-    public void CompletTaskTest()
+    public void TaskCompletedTest()
     {
         var writableTask = new MyWritableTask();
         MyTask task = writableTask;
 
-        task.IsCompleted.Should().BeFalse();
-
         writableTask.SetResult();
 
         task.IsCompleted.Should().BeTrue();
+        FluentActions.Invoking(() => task.EnsureComplete()).Should().NotThrow();
     }
 
     [Test]
-    public void IncompletTaskWithResultTest()
+    public void GenericTaskIncompletedTest()
     {
         var task = new MyTask<int>();
 
         task.IsCompleted.Should().BeFalse();
-        task.Result.Should().Be(0);
+        FluentActions.Invoking(() => task.EnsureComplete()).Should().Throw<TaskIncompletedException>();
+        FluentActions.Invoking(() => task.Result).Should().Throw<TaskIncompletedException>();
     }
 
     [Test]
-    public void CompletTaskWithResultTest()
+    public void GenericTaskCompletedTest()
     {
         var writableTask = new MyWritableTask<int>();
         MyTask<int> task = writableTask;
@@ -49,5 +51,92 @@ public class TaskTest
 
         task.IsCompleted.Should().BeTrue();
         task.Result.Should().Be(1);
+        FluentActions.Invoking(() => task.EnsureComplete()).Should().NotThrow();
+    }
+
+    [Test]
+    public void TaskCallbackTest()
+    {
+        var writableTask = new MyWritableTask();
+        MyTask task = writableTask;
+        var pass = false;
+
+        task.OnComplete(_ => { pass = true; });
+
+        writableTask.SetResult();
+
+        pass.Should().BeTrue();
+    }
+
+    [Test]
+    public void GenericTaskCallbackTest()
+    {
+        var writableTask = new MyWritableTask<int>();
+        MyTask<int> task = writableTask;
+        var receivedResult = 0;
+
+        task.OnComplete((value, _) => { receivedResult = value; });
+
+        writableTask.SetResult(1);
+
+        receivedResult.Should().Be(1);
+    }
+
+    [Test]
+    public void TaskWithExceptionTest()
+    {
+        var writableTask = new MyWritableTask();
+        MyTask task = writableTask;
+        var testException = new TestException();
+
+        writableTask.SetException(testException);
+
+        task.IsCompleted.Should().BeTrue();
+        task.Exception.Should().Be(testException);
+        FluentActions.Invoking(() => task.EnsureComplete())
+            .Should().Throw<TestException>();
+    }
+
+    [Test]
+    public void GenericTaskWithExceptionTest()
+    {
+        var writableTask = new MyWritableTask<int>();
+        MyTask<int> task = writableTask;
+        var testException = new TestException();
+
+        writableTask.SetException(testException);
+
+        task.IsCompleted.Should().BeTrue();
+        task.Exception.Should().Be(testException);
+        FluentActions.Invoking(() => task.Result)
+            .Should().Throw<TestException>();
+    }
+
+    [Test]
+    public void TaskExceptionCallbackTest()
+    {
+        var writableTask = new MyWritableTask();
+        MyTask task = writableTask;
+        var testException = new TestException();
+        Exception? receivedException = null;
+
+        task.OnComplete(exception => { receivedException = exception; });
+        writableTask.SetException(testException);
+
+        receivedException.Should().Be(testException);
+    }
+
+    [Test]
+    public void GenericTaskExceptionCallbackTest()
+    {
+        var writableTask = new MyWritableTask<int>();
+        MyTask<int> task = writableTask;
+        var testException = new TestException();
+        Exception? receivedException = null;
+
+        task.OnComplete((_, exception) => { receivedException = exception; });
+        writableTask.SetException(testException);
+
+        receivedException.Should().Be(testException);
     }
 }
