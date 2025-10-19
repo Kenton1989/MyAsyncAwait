@@ -18,10 +18,15 @@ public class MyTask
 
     public void OnComplete(Action<Exception?> action)
     {
+        if (IsCompleted)
+        {
+            action(Exception);
+            return;
+        }
         OnCompleteActions.Add(() => action(Exception));
     }
 
-    public void EnsureComplete()
+    public void CheckException()
     {
         if (!IsCompleted)
         {
@@ -60,13 +65,18 @@ public class MyTask<TResult> : MyTask
 
     private TResult GetResult()
     {
-        EnsureComplete();
+        CheckException();
         
         return _result!;
     }
 
     public void OnComplete(Action<TResult?, Exception?> action)
     {
+        if (IsCompleted)
+        {
+            action(_result, Exception);
+            return;
+        }
         OnCompleteActions.Add(() => action(_result, Exception));
     }
 }

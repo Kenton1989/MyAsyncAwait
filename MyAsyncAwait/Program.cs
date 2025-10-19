@@ -32,7 +32,7 @@ IEnumerable<MyTask> MainTaskImpl(MyWritableTask resultTask)
 
     paoQuanTokenSource.Cancel();
     yield return paoQuanTask;
-    paoQuanTask.EnsureComplete();
+    paoQuanTask.CheckException();
 
     resultTask.SetResult();
 }

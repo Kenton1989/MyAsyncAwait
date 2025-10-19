@@ -16,7 +16,7 @@ public class TaskTest
         var task = new MyTask();
 
         task.IsCompleted.Should().BeFalse();
-        FluentActions.Invoking(() => task.EnsureComplete()).Should().Throw<TaskIncompletedException>();
+        FluentActions.Invoking(() => task.CheckException()).Should().Throw<TaskIncompletedException>();
     }
 
     [Test]
@@ -28,7 +28,7 @@ public class TaskTest
         writableTask.SetResult();
 
         task.IsCompleted.Should().BeTrue();
-        FluentActions.Invoking(() => task.EnsureComplete()).Should().NotThrow();
+        FluentActions.Invoking(() => task.CheckException()).Should().NotThrow();
     }
 
     [Test]
@@ -37,7 +37,7 @@ public class TaskTest
         var task = new MyTask<int>();
 
         task.IsCompleted.Should().BeFalse();
-        FluentActions.Invoking(() => task.EnsureComplete()).Should().Throw<TaskIncompletedException>();
+        FluentActions.Invoking(() => task.CheckException()).Should().Throw<TaskIncompletedException>();
         FluentActions.Invoking(() => task.Result).Should().Throw<TaskIncompletedException>();
     }
 
@@ -51,7 +51,7 @@ public class TaskTest
 
         task.IsCompleted.Should().BeTrue();
         task.Result.Should().Be(1);
-        FluentActions.Invoking(() => task.EnsureComplete()).Should().NotThrow();
+        FluentActions.Invoking(() => task.CheckException()).Should().NotThrow();
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class TaskTest
 
         task.IsCompleted.Should().BeTrue();
         task.Exception.Should().Be(testException);
-        FluentActions.Invoking(() => task.EnsureComplete())
+        FluentActions.Invoking(() => task.CheckException())
             .Should().Throw<TestException>();
     }
 
@@ -138,5 +138,31 @@ public class TaskTest
         writableTask.SetException(testException);
 
         receivedException.Should().Be(testException);
+    }
+
+    [Test]
+    public void TaskCallbackAfterCompleteTest()
+    {
+        var writableTask = new MyWritableTask();
+        MyTask task = writableTask;
+        var pass = false;
+
+        writableTask.SetResult();
+        task.OnComplete(_ => { pass = true; });
+
+        pass.Should().BeTrue();
+    }
+
+    [Test]
+    public void GenericTaskCallbackAfterCompleteTest()
+    {
+        var writableTask = new MyWritableTask<int>();
+        MyTask<int> task = writableTask;
+        var receivedResult = 0;
+
+        writableTask.SetResult(1);
+        task.OnComplete((value, _) => { receivedResult = value; });
+
+        receivedResult.Should().Be(1);
     }
 }
