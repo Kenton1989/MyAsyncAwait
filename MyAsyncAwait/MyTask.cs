@@ -9,6 +9,8 @@ public class MyTask
 
     protected void Complete()
     {
+        if (IsCompleted) return;
+
         IsCompleted = true;
         foreach (var action in OnCompleteActions)
         {
@@ -23,6 +25,7 @@ public class MyTask
             action(Exception);
             return;
         }
+
         OnCompleteActions.Add(() => action(Exception));
     }
 
@@ -37,6 +40,13 @@ public class MyTask
         {
             throw Exception;
         }
+    }
+
+    public static readonly MyTask CompletedTask = new() { IsCompleted = true };
+
+    public static MyTask Run(Func<MyWritableTask, IEnumerable<MyTask>> tasks)
+    {
+        return TaskRunner.Run(tasks);
     }
 }
 
@@ -57,6 +67,7 @@ public class MyWritableTask : MyTask
 public class MyTask<TResult> : MyTask
 {
     private TResult? _result;
+
     public TResult Result
     {
         get => GetResult();
@@ -66,7 +77,7 @@ public class MyTask<TResult> : MyTask
     private TResult GetResult()
     {
         CheckException();
-        
+
         return _result!;
     }
 
@@ -77,6 +88,7 @@ public class MyTask<TResult> : MyTask
             action(_result, Exception);
             return;
         }
+
         OnCompleteActions.Add(() => action(_result, Exception));
     }
 }
