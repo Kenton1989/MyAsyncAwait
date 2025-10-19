@@ -44,7 +44,7 @@ public class MyTask
 
     public static readonly MyTask CompletedTask = new() { IsCompleted = true };
 
-    public static MyTask Run(Func<MyWritableTask, IEnumerable<MyTask>> tasks)
+    public static MyTask Run(Func<IEnumerable<MyTask>> tasks)
     {
         return TaskRunner.Run(tasks);
     }

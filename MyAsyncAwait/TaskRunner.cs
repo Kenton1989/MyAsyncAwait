@@ -2,10 +2,10 @@
 
 internal static class TaskRunner
 {
-    public static MyTask Run(Func<MyWritableTask, IEnumerable<MyTask>> tasks)
+    public static MyTask Run(Func<IEnumerable<MyTask>> tasks)
     {
         var resultTask = new MyWritableTask();
-        var generator = tasks(resultTask);
+        var generator = tasks();
 
         foreach (var task in generator)
         {

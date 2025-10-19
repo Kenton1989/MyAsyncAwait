@@ -16,7 +16,7 @@ public class TaskRunnerTest
         pass.Should().BeTrue();
 
         return;
-        IEnumerable<MyTask> SimpleTask(MyWritableTask resultTask)
+        IEnumerable<MyTask> SimpleTask()
         {
             pass = true;
             yield break;
@@ -40,7 +40,7 @@ public class TaskRunnerTest
             return MyTask.CompletedTask;
         }
 
-        IEnumerable<MyTask> ImmediatelyCompleted(MyWritableTask resultTask)
+        IEnumerable<MyTask> ImmediatelyCompleted()
         {
             var task = ImmediateCompleted();
             yield return task;
