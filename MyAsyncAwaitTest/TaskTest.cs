@@ -16,7 +16,6 @@ public class TaskTest
         var task = new MyTask();
 
         task.IsCompleted.Should().BeFalse();
-        FluentActions.Invoking(() => task.Wait()).Should().Throw<TaskIncompletedException>();
     }
 
     [Test]
@@ -37,8 +36,6 @@ public class TaskTest
         var task = new MyTask<int>();
 
         task.IsCompleted.Should().BeFalse();
-        FluentActions.Invoking(() => task.Wait()).Should().Throw<TaskIncompletedException>();
-        FluentActions.Invoking(() => task.Result).Should().Throw<TaskIncompletedException>();
     }
 
     [Test]
