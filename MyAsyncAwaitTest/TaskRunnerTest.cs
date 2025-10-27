@@ -54,21 +54,34 @@ public class TaskRunnerTest
     public void TestDelayedCompletedTask()
     {
         var testDelay = TimeSpan.FromSeconds(1);
+        var testPrecision = TimeSpan.FromMilliseconds(100);
+        DateTimeOffset taskYieldTime = default, taskContinueTime = default;
 
         var startTime = DateTimeOffset.Now;
         var testTask = MyTask.Run(TestFunction);
         testTask.Wait();
         var endTime = DateTimeOffset.Now;
 
-        testTask.IsCompleted.Should().BeTrue();
-        (endTime - startTime).Should().BeGreaterThan(testDelay); 
+        taskYieldTime.Should().NotBe(default);
+        taskContinueTime.Should().NotBe(default);
 
+        testTask.IsCompleted.Should().BeTrue();
+        var totalDuration = endTime - startTime;
+        var yieldToContinue = taskContinueTime - taskYieldTime;
+        var continueToEndTime = endTime - taskContinueTime;
+        
+        totalDuration.Should().BeCloseTo(testDelay, testPrecision);
+        yieldToContinue.Should().BeCloseTo(testDelay, testPrecision);
+        continueToEndTime.Should().BeCloseTo(TimeSpan.Zero, testPrecision);
+        
         return;
 
         IEnumerable<MyTask> TestFunction()
         {
             var task = DelayOneSecond();
+            taskYieldTime = DateTimeOffset.Now;
             yield return task;
+            taskContinueTime = DateTimeOffset.Now;
             task.Wait();
         }
 
