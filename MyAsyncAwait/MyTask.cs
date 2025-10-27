@@ -2,7 +2,8 @@
 
 public class MyTask
 {
-    public bool IsCompleted { get; protected set; }
+    private readonly ManualResetEvent _taskCompletedEvent = new(false);
+    public bool IsCompleted => _taskCompletedEvent.WaitOne(0);
     public Exception? Exception { get; protected set; }
 
     protected readonly List<Action> OnCompleteActions = [];
@@ -11,14 +12,17 @@ public class MyTask
     {
         if (IsCompleted) return;
 
-        IsCompleted = true;
+        var completedByThisThread = _taskCompletedEvent.Set();
+        if (!completedByThisThread)
+            return;
+
         foreach (var action in OnCompleteActions)
         {
             action();
         }
     }
 
-    public void OnComplete(Action<Exception?> action)
+    public void ContinueWith(Action<Exception?> action)
     {
         if (IsCompleted)
         {
@@ -29,20 +33,22 @@ public class MyTask
         OnCompleteActions.Add(() => action(Exception));
     }
 
-    public void CheckException()
+    public bool Wait()
     {
-        if (!IsCompleted)
-        {
-            throw new TaskIncompletedException("The task has not completed.");
-        }
+        if (!_taskCompletedEvent.WaitOne())
+            return false;
 
-        if (Exception != null)
-        {
-            throw Exception;
-        }
+        return Exception != null ? throw Exception : true;
     }
 
-    public static readonly MyTask CompletedTask = new() { IsCompleted = true };
+    public static readonly MyTask CompletedTask = CreateCompletedTask();
+
+    private static MyWritableTask CreateCompletedTask()
+    {
+        var res = new MyWritableTask();
+        res.SetResult();
+        return res;
+    }
 
     public static MyTask Run(Func<IEnumerable<MyTask>> tasks)
     {
@@ -76,7 +82,7 @@ public class MyTask<TResult> : MyTask
 
     private TResult GetResult()
     {
-        CheckException();
+        Wait();
 
         return _result!;
     }

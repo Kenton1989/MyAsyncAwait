@@ -24,11 +24,11 @@ public class TaskRunnerTest
     }
 
     [Test]
-    public void TestImmediatelyCompletedCallTask()
+    public void TestImmediatelyCompletedTask()
     {
         var pass = false;
 
-        var testTask = MyTask.Run(ImmediatelyCompleted);
+        var testTask = MyTask.Run(TestFunction);
 
         testTask.IsCompleted.Should().BeTrue();
         pass.Should().BeTrue();
@@ -40,13 +40,44 @@ public class TaskRunnerTest
             return MyTask.CompletedTask;
         }
 
-        IEnumerable<MyTask> ImmediatelyCompleted()
+        IEnumerable<MyTask> TestFunction()
         {
             var task = ImmediateCompleted();
             yield return task;
-            task.CheckException();
+            task.Wait();
 
             pass = true;
+        }
+    }
+
+    [Test]
+    public void TestDelayedCompletedTask()
+    {
+        var testDelay = TimeSpan.FromSeconds(1);
+
+        var startTime = DateTimeOffset.Now;
+        var testTask = MyTask.Run(TestFunction);
+        testTask.Wait();
+        var endTime = DateTimeOffset.Now;
+
+        testTask.IsCompleted.Should().BeTrue();
+        (endTime - startTime).Should().BeGreaterThan(testDelay); 
+
+        return;
+
+        IEnumerable<MyTask> TestFunction()
+        {
+            var task = DelayOneSecond();
+            yield return task;
+            task.Wait();
+        }
+
+        MyTask DelayOneSecond()
+        {
+            var task = new MyWritableTask();
+            Task.Delay(testDelay)
+                .ContinueWith(_ => task.SetResult());
+            return task;
         }
     }
 }

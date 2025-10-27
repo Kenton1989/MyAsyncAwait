@@ -16,7 +16,7 @@ public class TaskTest
         var task = new MyTask();
 
         task.IsCompleted.Should().BeFalse();
-        FluentActions.Invoking(() => task.CheckException()).Should().Throw<TaskIncompletedException>();
+        FluentActions.Invoking(() => task.Wait()).Should().Throw<TaskIncompletedException>();
     }
 
     [Test]
@@ -28,7 +28,7 @@ public class TaskTest
         writableTask.SetResult();
 
         task.IsCompleted.Should().BeTrue();
-        FluentActions.Invoking(() => task.CheckException()).Should().NotThrow();
+        FluentActions.Invoking(() => task.Wait()).Should().NotThrow();
     }
 
     [Test]
@@ -37,7 +37,7 @@ public class TaskTest
         var task = new MyTask<int>();
 
         task.IsCompleted.Should().BeFalse();
-        FluentActions.Invoking(() => task.CheckException()).Should().Throw<TaskIncompletedException>();
+        FluentActions.Invoking(() => task.Wait()).Should().Throw<TaskIncompletedException>();
         FluentActions.Invoking(() => task.Result).Should().Throw<TaskIncompletedException>();
     }
 
@@ -51,7 +51,7 @@ public class TaskTest
 
         task.IsCompleted.Should().BeTrue();
         task.Result.Should().Be(1);
-        FluentActions.Invoking(() => task.CheckException()).Should().NotThrow();
+        FluentActions.Invoking(() => task.Wait()).Should().NotThrow();
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class TaskTest
         MyTask task = writableTask;
         var pass = false;
 
-        task.OnComplete(_ => { pass = true; });
+        task.ContinueWith(_ => { pass = true; });
 
         writableTask.SetResult();
 
@@ -93,7 +93,7 @@ public class TaskTest
 
         task.IsCompleted.Should().BeTrue();
         task.Exception.Should().Be(testException);
-        FluentActions.Invoking(() => task.CheckException())
+        FluentActions.Invoking(() => task.Wait())
             .Should().Throw<TestException>();
     }
 
@@ -120,7 +120,7 @@ public class TaskTest
         var testException = new TestException();
         Exception? receivedException = null;
 
-        task.OnComplete(exception => { receivedException = exception; });
+        task.ContinueWith(exception => { receivedException = exception; });
         writableTask.SetException(testException);
 
         receivedException.Should().Be(testException);
@@ -148,7 +148,7 @@ public class TaskTest
         var pass = false;
 
         writableTask.SetResult();
-        task.OnComplete(_ => { pass = true; });
+        task.ContinueWith(_ => { pass = true; });
 
         pass.Should().BeTrue();
     }
