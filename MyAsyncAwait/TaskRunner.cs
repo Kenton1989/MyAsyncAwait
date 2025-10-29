@@ -4,16 +4,41 @@ internal static class TaskRunner
 {
     public static MyTask Run(Func<IEnumerable<MyTask>> tasks)
     {
-        var resultTask = new MyWritableTask();
         var generator = tasks();
-
-        foreach (var task in generator)
+        var box = new TaskStateBox
         {
-            continue;
+            PendingTasks = generator.GetEnumerator(),
+            ResultTask = new MyWritableTask()
+        };
+
+        ProcessTask(box);
+
+        return box.ResultTask;
+    }
+
+    private static void ProcessTask(TaskStateBox box)
+    {
+        var pendingTasks = box.PendingTasks;
+        var resultTask = box.ResultTask;
+
+        try
+        {
+            if (pendingTasks.MoveNext())
+            {
+                var pendingTask = pendingTasks.Current;
+                pendingTask.ContinueWith(e =>
+                {
+                    ProcessTask(box);
+                });
+            }
+            else
+            {
+                resultTask.SetResult();
+            }
         }
-
-        if (!resultTask.IsCompleted) resultTask.SetResult();
-
-        return resultTask;
+        catch (Exception ex)
+        {
+            resultTask.SetException(ex);
+        }
     }
 }
