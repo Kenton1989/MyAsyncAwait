@@ -16,6 +16,7 @@ public class TaskRunnerTest
         pass.Should().BeTrue();
 
         return;
+
         IEnumerable<MyTask> SimpleTask()
         {
             pass = true;
@@ -69,11 +70,11 @@ public class TaskRunnerTest
         var totalDuration = endTime - startTime;
         var yieldToContinue = taskContinueTime - taskYieldTime;
         var continueToEndTime = endTime - taskContinueTime;
-        
+
         totalDuration.Should().BeCloseTo(testDelay, testPrecision);
         yieldToContinue.Should().BeCloseTo(testDelay, testPrecision);
         continueToEndTime.Should().BeCloseTo(TimeSpan.Zero, testPrecision);
-        
+
         return;
 
         IEnumerable<MyTask> TestFunction()
@@ -88,8 +89,14 @@ public class TaskRunnerTest
         MyTask DelayOneSecond()
         {
             var task = new MyWritableTask();
-            Task.Delay(testDelay)
-                .ContinueWith(_ => task.SetResult());
+
+            _ = new Timer(
+                _ => task.SetResult(),
+                null,
+                (int)testDelay.TotalMilliseconds,
+                -1
+            );
+
             return task;
         }
     }
