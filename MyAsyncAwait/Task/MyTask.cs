@@ -68,6 +68,18 @@ public class MyTask
     {
         return TaskRunner.Instance.Run(tasksWithResult);;
     }
+    
+    public static MyTask Delay(int milliseconds)
+    {
+        var task = new MyWritableTask();
+        _ = new Timer(
+            _ => task.SetResult(),
+            null,
+            milliseconds,
+            -1
+        );
+        return task;
+    }
 }
 
 public class MyTask<TResult> : MyTask
