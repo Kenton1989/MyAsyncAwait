@@ -1,5 +1,4 @@
 ﻿using AwesomeAssertions;
-using MyAsyncAwait;
 using MyAsyncAwait.Task;
 using MyAsyncAwait.ThreadPool;
 

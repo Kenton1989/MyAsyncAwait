@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using MyAsyncAwait;
 using MyAsyncAwait.Task;
 
 Console.WriteLine("Hello, World!");

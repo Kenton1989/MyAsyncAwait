@@ -1,7 +1,5 @@
 ﻿using AwesomeAssertions;
-using MyAsyncAwait;
 using MyAsyncAwait.ThreadPool;
-using NUnit.Framework.Internal;
 
 namespace MyAsyncAwaitTest;
 
