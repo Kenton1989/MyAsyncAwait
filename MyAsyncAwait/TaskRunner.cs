@@ -22,6 +22,16 @@ internal class TaskRunner
         return box.ResultTask;
     }
 
+    public MyTask<TResult> Run<TResult>(AsyncTasksWithResult<TResult> tasksWithResult)
+    {
+        var result = new MyWritableTask<TResult>();
+        foreach (var _ in tasksWithResult(result))
+        {
+            
+        }
+        return result;
+    }
+
     private void QueueProcessTask(TaskStateBox box)
     {
         MyThreadPool.Instance.QueueWork(() => ProcessTask(box));

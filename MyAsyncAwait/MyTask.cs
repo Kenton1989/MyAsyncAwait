@@ -61,17 +61,10 @@ public class MyTask
     {
         return TaskRunner.Instance.Run(tasks);
     }
-    
-    public delegate IEnumerable<MyTask> AsyncTaskWithOutput<TResult>(MyWritableTask<TResult> tasks);
 
-    public static MyTask<TResult> Run<TResult>(AsyncTaskWithOutput<TResult> asyncTask)
+    public static MyTask<TResult> Run<TResult>(AsyncTasksWithResult<TResult> tasksWithResult)
     {
-        var result = new MyWritableTask<TResult>();
-        foreach (var _ in asyncTask(result))
-        {
-            
-        }
-        return result;
+        return TaskRunner.Instance.Run(tasksWithResult);;
     }
 }
 
