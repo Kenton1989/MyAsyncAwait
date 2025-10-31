@@ -1,5 +1,7 @@
 ﻿using AwesomeAssertions;
 using MyAsyncAwait;
+using MyAsyncAwait.Task;
+using MyAsyncAwait.ThreadPool;
 
 namespace MyAsyncAwaitTest;
 
@@ -172,8 +174,8 @@ public class TaskRunnerTest
     {
         var testTask = MyTask.Run<int>(TestFunction);
 
-        testTask.IsCompleted.Should().BeTrue();
         testTask.Result.Should().Be(42);
+        testTask.IsCompleted.Should().BeTrue();
 
         return;
 

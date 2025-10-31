@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace MyAsyncAwait;
+namespace MyAsyncAwait.ThreadPool;
 
 public class MyThreadPool : IDisposable
 {

@@ -1,4 +1,4 @@
-﻿namespace MyAsyncAwait;
+﻿namespace MyAsyncAwait.Runner;
 
 internal enum MyVoidType
 {

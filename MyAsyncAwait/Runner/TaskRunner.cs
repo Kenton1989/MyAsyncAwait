@@ -1,4 +1,7 @@
-﻿namespace MyAsyncAwait;
+﻿using MyAsyncAwait.Task;
+using MyAsyncAwait.ThreadPool;
+
+namespace MyAsyncAwait.Runner;
 
 internal class TaskRunner
 {

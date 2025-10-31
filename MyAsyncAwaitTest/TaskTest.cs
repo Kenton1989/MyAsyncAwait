@@ -1,5 +1,6 @@
 using AwesomeAssertions;
 using MyAsyncAwait;
+using MyAsyncAwait.Task;
 
 namespace MyAsyncAwaitTest;
 

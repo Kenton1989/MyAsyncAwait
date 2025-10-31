@@ -1,4 +1,6 @@
-﻿namespace MyAsyncAwait;
+﻿using MyAsyncAwait.Task;
+
+namespace MyAsyncAwait.Runner;
 
 internal class TaskStateBox<TResult>
 {

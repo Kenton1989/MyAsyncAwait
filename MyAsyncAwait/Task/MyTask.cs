@@ -1,4 +1,6 @@
-﻿namespace MyAsyncAwait;
+﻿using MyAsyncAwait.Runner;
+
+namespace MyAsyncAwait.Task;
 
 public class MyTask
 {
@@ -68,20 +70,6 @@ public class MyTask
     }
 }
 
-public class MyWritableTask : MyTask
-{
-    public void SetResult()
-    {
-        Complete();
-    }
-
-    public void SetException(Exception exception)
-    {
-        Exception = exception;
-        Complete();
-    }
-}
-
 public class MyTask<TResult> : MyTask
 {
     private TResult _result = default!;
@@ -108,20 +96,5 @@ public class MyTask<TResult> : MyTask
         }
 
         OnCompleteActions.Add(() => action(_result, Exception));
-    }
-}
-
-public class MyWritableTask<TResult> : MyTask<TResult>
-{
-    public void SetResult(TResult result)
-    {
-        Result = result;
-        Complete();
-    }
-
-    public void SetException(Exception exception)
-    {
-        Exception = exception;
-        Complete();
     }
 }
