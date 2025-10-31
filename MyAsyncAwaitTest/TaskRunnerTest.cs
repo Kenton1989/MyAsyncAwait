@@ -30,6 +30,7 @@ public class TaskRunnerTest
         var pass = false;
 
         var testTask = MyTask.Run(TestFunction);
+        testTask.Wait();
 
         testTask.IsCompleted.Should().BeTrue();
         pass.Should().BeTrue();
@@ -98,6 +99,29 @@ public class TaskRunnerTest
             );
 
             return task;
+        }
+    }
+    
+    [Test]
+    public void MyTaskShouldUseMyThreadPool()
+    {
+        int threadId1 = 0, threadId2 = 0;
+        var testTask = MyTask.Run(TestFunction);
+        testTask.Wait();
+
+        testTask.IsCompleted.Should().BeTrue();
+        threadId1.Should().Be(Environment.CurrentManagedThreadId);
+        MyThreadPool.Instance.IsMyThread(threadId2).Should().BeTrue();
+
+        return;
+
+        IEnumerable<MyTask> TestFunction()
+        {
+            threadId1 = Environment.CurrentManagedThreadId;
+            var task = MyTask.CompletedTask;
+            yield return task;
+            task.Wait();
+            threadId2 = Environment.CurrentManagedThreadId;
         }
     }
 }

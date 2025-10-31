@@ -74,7 +74,7 @@ public class ThreadPoolTest
     [Test]
     public void ThreadIsNotInThePool()
     {
-        _target.IsMyThread(Thread.CurrentThread.ManagedThreadId).Should().BeFalse();
+        _target.IsMyThread(Environment.CurrentManagedThreadId).Should().BeFalse();
     }
 
 
@@ -95,7 +95,7 @@ public class ThreadPoolTest
 
         void TestFunc()
         {
-            threadId = Thread.CurrentThread.ManagedThreadId;
+            threadId = Environment.CurrentManagedThreadId;
             doneSignal.Set();
         }
     }

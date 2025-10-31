@@ -6,7 +6,6 @@ internal class TaskRunner
 
     private TaskRunner()
     {
-        
     }
 
     public MyTask Run(Func<IEnumerable<MyTask>> tasks)
@@ -23,6 +22,11 @@ internal class TaskRunner
         return box.ResultTask;
     }
 
+    private void QueueProcessTask(TaskStateBox box)
+    {
+        MyThreadPool.Instance.QueueWork(() => ProcessTask(box));
+    }
+
     private void ProcessTask(TaskStateBox box)
     {
         var pendingTasks = box.PendingTasks;
@@ -33,10 +37,7 @@ internal class TaskRunner
             if (pendingTasks.MoveNext())
             {
                 var pendingTask = pendingTasks.Current;
-                pendingTask.ContinueWith(e =>
-                {
-                    ProcessTask(box);
-                });
+                pendingTask.ContinueWith(e => { QueueProcessTask(box); });
             }
             else
             {
