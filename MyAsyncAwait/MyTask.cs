@@ -52,7 +52,7 @@ public class MyTask
 
     public static MyTask Run(Func<IEnumerable<MyTask>> tasks)
     {
-        return TaskRunner.Run(tasks);
+        return TaskRunner.Instance.Run(tasks);
     }
 }
 

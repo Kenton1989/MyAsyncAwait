@@ -1,8 +1,15 @@
 ﻿namespace MyAsyncAwait;
 
-internal static class TaskRunner
+internal class TaskRunner
 {
-    public static MyTask Run(Func<IEnumerable<MyTask>> tasks)
+    public static readonly TaskRunner Instance = new();
+
+    private TaskRunner()
+    {
+        
+    }
+
+    public MyTask Run(Func<IEnumerable<MyTask>> tasks)
     {
         var generator = tasks();
         var box = new TaskStateBox
@@ -16,7 +23,7 @@ internal static class TaskRunner
         return box.ResultTask;
     }
 
-    private static void ProcessTask(TaskStateBox box)
+    private void ProcessTask(TaskStateBox box)
     {
         var pendingTasks = box.PendingTasks;
         var resultTask = box.ResultTask;
