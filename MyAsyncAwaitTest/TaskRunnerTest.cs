@@ -166,4 +166,27 @@ public class TaskRunnerTest
             yield break;
         }
     }
+
+    [Test]
+    public void GenericTestImmediatelyCompletedTask()
+    {
+        var testTask = MyTask.Run<int>(TestFunction);
+
+        testTask.IsCompleted.Should().BeTrue();
+        testTask.Result.Should().Be(42);
+
+        return;
+
+        MyTask<int> ImmediateCompleted()
+        {
+            return MyTask.FromResult(42);
+        }
+
+        IEnumerable<MyTask> TestFunction(MyWritableTask<int> resultTask)
+        {
+            var task = ImmediateCompleted();
+            yield return task;
+            resultTask.SetResult(task.Result);
+        }
+    }
 }

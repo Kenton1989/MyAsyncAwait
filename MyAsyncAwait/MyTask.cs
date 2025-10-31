@@ -66,7 +66,12 @@ public class MyTask
 
     public static MyTask<TResult> Run<TResult>(AsyncTaskWithOutput<TResult> asyncTask)
     {
-        return FromResult(default(TResult)!);
+        var result = new MyWritableTask<TResult>();
+        foreach (var _ in asyncTask(result))
+        {
+            
+        }
+        return result;
     }
 }
 
@@ -86,7 +91,7 @@ public class MyWritableTask : MyTask
 
 public class MyTask<TResult> : MyTask
 {
-    private TResult? _result;
+    private TResult _result = default!;
 
     public TResult Result
     {
@@ -98,7 +103,7 @@ public class MyTask<TResult> : MyTask
     {
         Wait();
 
-        return _result!;
+        return _result;
     }
 
     public void OnComplete(Action<TResult?, Exception?> action)
