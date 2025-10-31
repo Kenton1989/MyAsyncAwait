@@ -50,9 +50,23 @@ public class MyTask
         return res;
     }
 
+    public static MyTask<T> FromResult<T>(T result)
+    {
+        var task = new MyWritableTask<T>();
+        task.SetResult(result);
+        return task;
+    }
+
     public static MyTask Run(Func<IEnumerable<MyTask>> tasks)
     {
         return TaskRunner.Instance.Run(tasks);
+    }
+    
+    public delegate IEnumerable<MyTask> AsyncTaskWithOutput<TResult>(MyWritableTask<TResult> tasks);
+
+    public static MyTask<TResult> Run<TResult>(AsyncTaskWithOutput<TResult> asyncTask)
+    {
+        return FromResult(default(TResult)!);
     }
 }
 

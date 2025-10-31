@@ -149,4 +149,21 @@ public class TaskRunnerTest
             return myTask;
         }
     }
+
+    [Test]
+    public void GenericTestSimpleTask()
+    {
+        var testTask = MyTask.Run<int>(SimpleTask);
+
+        testTask.IsCompleted.Should().BeTrue();
+        testTask.Result.Should().Be(0);
+
+        return;
+
+        IEnumerable<MyTask> SimpleTask(MyWritableTask<int> resultTask)
+        {
+            resultTask.SetResult(0);
+            yield break;
+        }
+    }
 }
