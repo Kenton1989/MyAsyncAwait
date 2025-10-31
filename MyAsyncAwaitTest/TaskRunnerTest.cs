@@ -101,7 +101,7 @@ public class TaskRunnerTest
             return task;
         }
     }
-    
+
     [Test]
     public void MyTaskShouldUseMyThreadPool()
     {
@@ -122,6 +122,31 @@ public class TaskRunnerTest
             yield return task;
             task.Wait();
             threadId2 = Environment.CurrentManagedThreadId;
+        }
+    }
+
+    [Test]
+    public void TaskWithExceptionShouldThrow()
+    {
+        var testTask = MyTask.Run(TestFunction);
+
+        FluentActions.Invoking(() => testTask.Wait())
+            .Should().Throw<TestException>();
+
+        return;
+
+        IEnumerable<MyTask> TestFunction()
+        {
+            var task = TriggerException();
+            yield return task;
+            task.Wait();
+        }
+
+        MyTask TriggerException()
+        {
+            var myTask = new MyWritableTask();
+            myTask.SetException(new TestException());
+            return myTask;
         }
     }
 }
