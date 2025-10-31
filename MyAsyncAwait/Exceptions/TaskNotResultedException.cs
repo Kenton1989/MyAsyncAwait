@@ -1,4 +1,4 @@
-﻿namespace MyAsyncAwait;
+﻿namespace MyAsyncAwait.Exceptions;
 
 public class TaskNotResultedException : Exception
 {
