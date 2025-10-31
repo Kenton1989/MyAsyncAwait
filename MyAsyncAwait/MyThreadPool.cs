@@ -7,6 +7,7 @@ public class MyThreadPool : IDisposable
     public static MyThreadPool Instance { get; } = new();
 
     private readonly Thread[] _workerThreads;
+    private readonly ISet<int> _workerThreadIds;
     private readonly ConcurrentQueue<Action> _workItems = new();
     private readonly AutoResetEvent _workItemQueued = new(false);
 
@@ -15,6 +16,10 @@ public class MyThreadPool : IDisposable
         _workerThreads = Enumerable.Range(0, threadCount)
             .Select(CreateThread)
             .ToArray();
+
+        _workerThreadIds = _workerThreads
+            .Select(t => t.ManagedThreadId)
+            .ToHashSet();
     }
 
     private Thread CreateThread(int idx)
@@ -28,6 +33,11 @@ public class MyThreadPool : IDisposable
 
         thread.Start();
         return thread;
+    }
+
+    public bool IsMyThread(int threadId)
+    {
+        return _workerThreadIds.Contains(threadId);
     }
 
     public void QueueWork(Action func)

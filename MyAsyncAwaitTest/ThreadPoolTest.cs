@@ -70,4 +70,33 @@ public class ThreadPoolTest
             resetEvent.Set();
         }
     }
+
+    [Test]
+    public void ThreadIsNotInThePool()
+    {
+        _target.IsMyThread(Thread.CurrentThread.ManagedThreadId).Should().BeFalse();
+    }
+
+
+    [Test]
+    public void ThreadPoolIsInThePool()
+    {
+        var threadId = 0;
+        var doneSignal = new ManualResetEvent(false);
+        
+        _target.QueueWork(TestFunc);
+        var done = doneSignal.WaitOne(TimeSpan.FromSeconds(1));
+        
+        done.Should().BeTrue();
+        threadId.Should().NotBe(0);
+        _target.IsMyThread(threadId).Should().BeTrue();
+
+        return;
+
+        void TestFunc()
+        {
+            threadId = Thread.CurrentThread.ManagedThreadId;
+            doneSignal.Set();
+        }
+    }
 }
