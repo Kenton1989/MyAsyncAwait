@@ -11,10 +11,11 @@ internal class TaskRunner
     public MyTask Run(Func<IEnumerable<MyTask>> tasks)
     {
         var generator = tasks();
-        var box = new TaskStateBox
+        var resultTask = new MyWritableTask<MyVoidType>();
+        var box = new TaskStateBox<MyVoidType>
         {
             PendingTasks = generator.GetEnumerator(),
-            ResultTask = new MyWritableTask()
+            ResultTask = resultTask
         };
 
         ProcessTask(box);
@@ -25,19 +26,25 @@ internal class TaskRunner
     public MyTask<TResult> Run<TResult>(AsyncTasksWithResult<TResult> tasksWithResult)
     {
         var result = new MyWritableTask<TResult>();
-        foreach (var _ in tasksWithResult(result))
+        
+        var generator = tasksWithResult(result);
+        var box = new TaskStateBox<TResult>
         {
-            
-        }
+            PendingTasks = generator.GetEnumerator(),
+            ResultTask = result
+        };
+        
+        ProcessTask(box);
+
         return result;
     }
 
-    private void QueueProcessTask(TaskStateBox box)
+    private void QueueProcessTask<TResult>(TaskStateBox<TResult> box)
     {
         MyThreadPool.Instance.QueueWork(() => ProcessTask(box));
     }
 
-    private void ProcessTask(TaskStateBox box)
+    private void ProcessTask<TResult>(TaskStateBox<TResult> box)
     {
         var pendingTasks = box.PendingTasks;
         var resultTask = box.ResultTask;
@@ -51,7 +58,15 @@ internal class TaskRunner
             }
             else
             {
-                resultTask.SetResult();
+                pendingTasks.Dispose();
+
+                var voidResultTask = resultTask as MyWritableTask<MyVoidType>;
+                voidResultTask?.SetResult(MyVoidType.Void);
+
+                if (!resultTask.IsCompleted)
+                {
+                    throw new TaskNotResultedException();
+                }
             }
         }
         catch (Exception ex)

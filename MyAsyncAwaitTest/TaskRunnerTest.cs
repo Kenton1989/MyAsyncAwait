@@ -189,4 +189,55 @@ public class TaskRunnerTest
             resultTask.SetResult(task.Result);
         }
     }
+
+    [Test]
+    public void GenericTestDelayedCompletedTask()
+    {
+        var testDelay = TimeSpan.FromSeconds(1);
+        var testPrecision = TimeSpan.FromMilliseconds(100);
+        DateTimeOffset taskYieldTime = default, taskContinueTime = default;
+
+        var startTime = DateTimeOffset.Now;
+        var testTask = MyTask.Run<int>(TestFunction);
+        var result = testTask.Result;
+        var endTime = DateTimeOffset.Now;
+
+        taskYieldTime.Should().NotBe(default);
+        taskContinueTime.Should().NotBe(default);
+
+        testTask.IsCompleted.Should().BeTrue();
+        result.Should().Be(42);
+        var totalDuration = endTime - startTime;
+        var yieldToContinue = taskContinueTime - taskYieldTime;
+        var continueToEndTime = endTime - taskContinueTime;
+
+        totalDuration.Should().BeCloseTo(testDelay, testPrecision);
+        yieldToContinue.Should().BeCloseTo(testDelay, testPrecision);
+        continueToEndTime.Should().BeCloseTo(TimeSpan.Zero, testPrecision);
+
+        return;
+
+        IEnumerable<MyTask> TestFunction(MyWritableTask<int> resultTask)
+        {
+            var task = DelayOneSecond();
+            taskYieldTime = DateTimeOffset.Now;
+            yield return task;
+            taskContinueTime = DateTimeOffset.Now;
+            resultTask.SetResult(task.Result);
+        }
+
+        MyTask<int> DelayOneSecond()
+        {
+            var task = new MyWritableTask<int>();
+
+            _ = new Timer(
+                _ => task.SetResult(42),
+                null,
+                (int)testDelay.TotalMilliseconds,
+                -1
+            );
+
+            return task;
+        }
+    }
 }
